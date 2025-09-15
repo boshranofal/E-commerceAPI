@@ -1,5 +1,6 @@
 ﻿using E_commerceAPI.BLL.Services.Interfaces;
 using E_commerceAPI.DAL.DTO.Request;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,8 @@ namespace E_commerceAPI.Areas.Customer.Controllers
         [Route("api/[area]/[controller]")]
         [ApiController]
         [Area("Customer")]
-       [Authorize(Roles = "Customer")]
+    [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
+
     public class CartsController : ControllerBase
     {
         private readonly ICartService _cartService;
@@ -20,11 +22,11 @@ namespace E_commerceAPI.Areas.Customer.Controllers
             _cartService = cartService;
         }
         [HttpPost("AddToCart")]
-        public IActionResult AddCart(CartRequest request)
+        public async Task<IActionResult> AddCart(CartRequest request)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                     
-            var result = _cartService.AddToCart(request, userId);
+            var result = await _cartService.AddToCartAsync(request, userId);
             if (!result)
             {
                 return NotFound($"Failed to add to cart. Check if productId {request.productId} exists and is valid.");
@@ -32,24 +34,12 @@ namespace E_commerceAPI.Areas.Customer.Controllers
             return Ok();
         }
         [HttpGet("summary")]
-        public IActionResult GetUserCart()
+        public async Task<IActionResult> GetUserCart()
         {
             var userId= User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result= _cartService.CartSummaryResponcse(userId);
+            var result= _cartService.CartSummaryResponcseAsync(userId);
             return Ok(result);
         }
-       // [Authorize]
-        [HttpGet("test-claims")]
-        public IActionResult TestClaims()
-        {
-            foreach (var claim in User.Claims)
-            {
-                Console.WriteLine($"{claim.Type} => {claim.Value}");
-            }
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            return Ok(new { userId, claims = User.Claims.Select(c => new { c.Type, c.Value }) });
-        }
+       
     }
 }

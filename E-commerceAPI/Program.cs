@@ -41,6 +41,7 @@ namespace E_commerceAPI
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<ICartRepository, CartRepository>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 
             // Services
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
@@ -49,6 +50,7 @@ namespace E_commerceAPI
             builder.Services.AddScoped<IFileService, FileService>();
             builder.Services.AddScoped<IProductServices, ProductServices>();
             builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<ICheckoutService, CheckoutService>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddScoped<IEmailSender, EmailSetting>();
 

@@ -17,15 +17,23 @@ namespace E_commerceAPI.DAL.Reposetories.Classes
         public CartRepository(ApplicationDbContext context) {
             _context = context;
         }
-        public int Add(Cart cart)
+        public async Task<int> AddAsync(Cart cart)
         {
-            _context.Carts.Add(cart);
-            return _context.SaveChanges();
+            await _context.Carts.AddAsync(cart);
+            return await _context.SaveChangesAsync();
         }
 
-        public List<Cart> GetUserCart(string userId)
+        public async Task<bool> ClearCart(string userId)
         {
-            return _context.Carts.Include(c => c.Product).Where(c => c.userId == userId).ToList();
+            var items=_context.Carts.Where(c => c.userId == userId).ToList();//هون بترجع اكتر من عنصر 
+            _context.Carts.RemoveRange(items);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<Cart>> GetUserCartAsync(string userId)
+        {
+            return await _context.Carts.Include(c => c.Product).Where(c => c.userId == userId).ToListAsync();
         }
     }
 }

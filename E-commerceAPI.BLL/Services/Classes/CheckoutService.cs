@@ -22,12 +22,20 @@ namespace E_commerceAPI.BLL.Services.Classes
         private readonly ICartRepository _cartRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IEmailSender _emailSender;
+        private readonly IOrderItemRepository _orderItemRepository;
+        private readonly IProductRepository _productRepository;
 
-        public CheckoutService(ICartRepository cartRepository,IOrderRepository orderRepository,IEmailSender emailSender)
+        public CheckoutService(ICartRepository cartRepository,
+            IOrderRepository orderRepository,
+            IEmailSender emailSender,
+            IOrderItemRepository orderItemRepository,
+            IProductRepository productRepository)
         {
             _cartRepository = cartRepository;
             _orderRepository = orderRepository;
             _emailSender = emailSender;
+            _orderItemRepository = orderItemRepository;
+            _productRepository = productRepository;
         }
 
         public async Task<bool> HendelPaymentSuccessAsync(int orderId)
@@ -37,6 +45,33 @@ namespace E_commerceAPI.BLL.Services.Classes
             var body = "";
             if (order.PaymentMethod == StatusPaymentMethodEnum.Visa)
             {
+                order.Status = StatusOrderEnum.approved;
+
+                var carts= await _cartRepository.GetUserCartAsync(order.UserId);
+                var orderItems=new List<OrderItem>();
+                var productItems=new List<(int productId, int quantity)>();
+
+
+                foreach (var cartItem in carts)
+                {
+                    var orderItem = new OrderItem
+                    {
+                        OrderId = order.Id,
+                        ProductId = cartItem.productId,
+                       TotalPrice = cartItem.Count * cartItem.Product.Price,
+                       Price = cartItem.Product.Price,
+                       Count = cartItem.Count,
+                        
+                    };
+                   orderItems.Add(orderItem);
+                    productItems.Add((cartItem.productId, cartItem.Count));
+                 
+                }
+             // orderItem لحتى اعمل ريكوست مره وحدة بدل ما اعمل ريكوست كل  
+                await _orderItemRepository.AddRangeAsync(orderItems);
+                await _cartRepository.ClearCart(order.UserId);
+                await _productRepository.DecreaseQuantity(productItems);
+
                 subject = "Payment Success";
                 body = $"<h1>Thank you for your Payment</h1>+" +
                     $" <p>your payment for order{orderId}</p>"+
@@ -58,7 +93,7 @@ namespace E_commerceAPI.BLL.Services.Classes
 
         public async Task<CheckoutResponse> ProccessPaymentAsync(CheckoutRequest request, string UserId, HttpRequest httpRequest)
         {
-            var cartItems =  _cartRepository.GetUserCart(UserId);
+            var cartItems = await _cartRepository.GetUserCartAsync(UserId);
             if (!cartItems.Any())
             {
                 return new CheckoutResponse
@@ -71,7 +106,7 @@ namespace E_commerceAPI.BLL.Services.Classes
             E_commerceAPI.DAL.Model.Order order = new E_commerceAPI.DAL.Model.Order
             {
                 UserId = UserId,
-                PaymentMethod=StatusPaymentMethodEnum.Cach,
+                PaymentMethod=request.PaymentMethod,
                 TotalAmount= cartItems.Sum(i => i.Product.Price * i.Count),
             };
             await _orderRepository.AddAsync(order);

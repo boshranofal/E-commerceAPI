@@ -9,5 +9,6 @@ namespace E_commerceAPI.DAL.Reposetories.Intefaces
 {
     public interface IProductRepository : IGenericReposetories<Product>
     {
+        public Task DecreaseQuantity(List<(int productId, int quantity)> items);
     }
 }

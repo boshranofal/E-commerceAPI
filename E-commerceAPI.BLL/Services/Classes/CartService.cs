@@ -18,20 +18,20 @@ namespace E_commerceAPI.BLL.Services.Classes
         public CartService(ICartRepository cartRepository) {
             _cartRepository = cartRepository;
         }
-        public bool AddToCart(CartRequest request, string userId)
+        public async Task<bool> AddToCartAsync(CartRequest request, string userId)
         {
             var newCart = new Cart
             {
                  productId= request.productId,
                  userId= userId,
                  Count=1
-                };
-            return _cartRepository.Add(newCart)>0;
+            };
+            return await _cartRepository.AddAsync(newCart)>0;
             }
 
-        public CartSummaryResponcse CartSummaryResponcse(string userId)
+        public async Task<CartSummaryResponcse> CartSummaryResponcseAsync(string userId)
         {
-            var cartItems = _cartRepository.GetUserCart(userId);
+            var cartItems =await  _cartRepository.GetUserCartAsync(userId);
             var response = new CartSummaryResponcse
             {
                 Items = cartItems.Select(ci => new CartResponse
@@ -45,6 +45,11 @@ namespace E_commerceAPI.BLL.Services.Classes
 
             };
             return response;
+        }
+
+        public async Task<bool> ClearCartAsync(string userId)
+        {
+            return await  _cartRepository.ClearCart(userId);
         }
     }
     }

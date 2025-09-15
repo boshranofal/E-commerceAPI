@@ -16,5 +16,7 @@ namespace E_commerceAPI.DAL.Model
         public int ProductId { get; set; }
         public Product Product { get; set; }
         public decimal TotalPrice { get; set; }
+        public decimal Price { get; set; }
+        public int Count { get; set; }
     }
 }

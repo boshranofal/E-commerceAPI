@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace E_commerceAPI.DAL.Reposetories.Intefaces
 {
-    public interface ICartRepository
+    public interface IOrderItemRepository
     {
-       Task<int>AddAsync(Cart cart);
-       Task<List<Cart>> GetUserCartAsync(string userId);
-        Task<bool>ClearCart(string userId);
+        Task AddRangeAsync(List<OrderItem> item);
     }
 }

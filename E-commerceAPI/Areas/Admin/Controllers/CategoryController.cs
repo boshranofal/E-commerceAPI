@@ -1,5 +1,6 @@
 ﻿using E_commerceAPI.BLL.Services.Interfaces;
 using KAStore.DAL.DTO.Request;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace E_commerceAPI.Areas.Admin.Controllers
     [Route("api/[Area]/[controller]")]
     [ApiController]
     [Area("Admin")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,SuperAdmin")]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryServices _categoryServiece;

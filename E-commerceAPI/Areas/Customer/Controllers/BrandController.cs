@@ -1,4 +1,5 @@
 ﻿using E_commerceAPI.BLL.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ namespace E_commerceAPI.Areas.Customer.Controllers
     [Route("api/[Area]/[controller]")]
     [ApiController]
     [Area("Customer")]
-    //[Authorize(Roles = "Customer")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
     public class BrandController : ControllerBase
     {
         private readonly IBrandServices _brandServices;

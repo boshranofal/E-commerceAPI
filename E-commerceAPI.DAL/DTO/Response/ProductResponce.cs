@@ -11,6 +11,7 @@ namespace E_commerceAPI.DAL.DTO.Response
     {
         public string Name { get; set; }
         public string Description { get; set; }
+        public int Quantity { get; set; }
         [JsonIgnore]
         public string ImageMain { get; set; }
         public string ImageMainUrl=> $"https://localhost:7221/Image/{ImageMain}";
