@@ -19,6 +19,9 @@ namespace KAStore.DAL.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
 
+        public DbSet<ProductImage> ProductImages { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext>options):base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)

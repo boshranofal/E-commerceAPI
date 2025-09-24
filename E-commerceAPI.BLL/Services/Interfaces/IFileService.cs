@@ -10,5 +10,7 @@ namespace E_commerceAPI.BLL.Services.Interfaces
     public interface IFileService
     {
         Task<string> UplodeAsync(IFormFile file);
-    }
+        Task<List<string>> UplodeManyAsync(List<IFormFile> files);
+        
+        }
 }

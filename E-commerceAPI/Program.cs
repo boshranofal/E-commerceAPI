@@ -1,21 +1,22 @@
 using E_commerceAPI.BLL.Services.Classes;
 using E_commerceAPI.BLL.Services.Interfaces;
+using E_commerceAPI.DAL.Model;
 using E_commerceAPI.DAL.Reposetories.Classes;
 using E_commerceAPI.DAL.Reposetories.Intefaces;
 using E_commerceAPI.DAL.Utils;
-using KAStore.DAL.Data;
-using Scalar;
-using Microsoft.EntityFrameworkCore;
-using Scalar.AspNetCore;
-using E_commerceAPI.DAL.Model;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using E_commerceAPI.Utils;
+using KAStore.DAL.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Scalar;
+using Scalar.AspNetCore;
+using Stripe;
 using System.Security.Claims;
+using System.Text;
 
 namespace E_commerceAPI
 {
@@ -30,7 +31,14 @@ namespace E_commerceAPI
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            var userPolicy = "";
+            builder.Services.AddCors(Options =>
+            {
+                Options.AddPolicy(name: userPolicy, Policy =>
+                {
+                    Policy.AllowAnyOrigin();
+                });
+            });
             // Database
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -42,17 +50,22 @@ namespace E_commerceAPI
             builder.Services.AddScoped<ICartRepository, CartRepository>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 
             // Services
             builder.Services.AddScoped<ICategoryServices, CategoryServices>();
             builder.Services.AddScoped<IBrandServices, BrandServices>();
             builder.Services.AddScoped<ISeedData, SeedData>();
-            builder.Services.AddScoped<IFileService, FileService>();
+            builder.Services.AddScoped<IFileService, BLL.Services.Classes.FileService>();
             builder.Services.AddScoped<IProductServices, ProductServices>();
             builder.Services.AddScoped<ICartService, CartService>();
-            builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+            builder.Services.AddScoped<ICheckoutService, BLL.Services.Classes.CheckoutService>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddScoped<IEmailSender, EmailSetting>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IReviewService, BLL.Services.Classes.ReviewService>();
 
             // Authentication & JWT
             builder.Services.AddAuthentication(options =>
@@ -86,14 +99,21 @@ namespace E_commerceAPI
                 options.Password.RequireUppercase = true;
                 options.Password.RequireDigit = true;
                 options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = true;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+                options.Lockout.MaxFailedAccessAttempts = 5;
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
 
             builder.Services.AddAuthorization();
+            // Stripe configuration
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
 
             var app = builder.Build();
+            
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -119,6 +139,7 @@ namespace E_commerceAPI
 
             // **Important**: Authentication must come before Authorization
             app.UseAuthentication();
+            app.UseCors(userPolicy);
             app.UseAuthorization();
 
             app.UseStaticFiles();

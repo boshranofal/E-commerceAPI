@@ -9,7 +9,7 @@ namespace E_commerceAPI.Areas.Customer.Controllers
     [Route("api/[Area]/[controller]")]
     [ApiController]
     [Area("Customer")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
     public class BrandController : ControllerBase
     {
         private readonly IBrandServices _brandServices;
