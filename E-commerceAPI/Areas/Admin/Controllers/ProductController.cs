@@ -12,7 +12,7 @@ namespace E_commerceAPI.Areas.Admin.Controllers
     [Route("api/[area]/[controller]")]
     [ApiController]
     [Area("Admin")]
-    [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme,Roles = "Admin,SuperAdmin")]
+    //[Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme,Roles = "Admin,SuperAdmin")]
     
     public class ProductController : ControllerBase
     {
@@ -24,7 +24,7 @@ namespace E_commerceAPI.Areas.Admin.Controllers
         }
 
         [HttpGet("")]
-        public IActionResult GetAll()=> Ok(_productServices.GetAll());
+        public IActionResult GetAll()=> Ok(_productServices.GetAllProduct(Request));
        
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromForm]ProductRequest productRequest)

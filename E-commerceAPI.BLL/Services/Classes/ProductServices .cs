@@ -7,6 +7,7 @@ using E_commerceAPI.DAL.Reposetories.Intefaces;
 using KAStore.DAL.DTO.Request;
 using KAStore.DAL.DTO.Responce;
 using Mapster;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,37 @@ namespace E_commerceAPI.BLL.Services.Classes
                var imagePath= await _fileService.UplodeAsync(request.ImageMain);
                 entity.ImageMain = imagePath;
             }
+            if (request.SubImage != null)
+            {
+                var subImagesPasths=await _fileService.UplodeManyAsync(request.SubImage);
+                entity.SubImage=subImagesPasths.Select(img=>new ProductImage{ImageName=img}).ToList();
+            }
             return  _productRepository.Add(entity);
         }
-    }
+
+        public async Task<List<ProductResponce>> GetAllProduct(HttpRequest request, bool onlyActive = false)
+        {
+            var products = _productRepository.GetAllproductWithImage();
+            if (onlyActive)
+            {
+                products=products.Where(p => p.Status == Status.Active).ToList();
+            }
+            return products.Select(p => new ProductResponce
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Quantity = p.Quantity,
+                ImageMain = $"{request.Scheme}://{request.Host}/Image/{p.ImageMain}",
+                SubImageUrls = p.SubImage.Select(img => $"{request.Scheme}://{request.Host}/Image/{img.ImageName}").ToList(),
+                Reviews=p.Reviews.Select(p=>new ReviewResponse
+                {
+                    Id=p.Id,
+                    Comment=p.Comment,
+                    Rate=p.Rate,
+                    FullNmae=p.User.FullName,
+                
+                }).ToList(),
+            }).ToList();
+        }
+        }
 }

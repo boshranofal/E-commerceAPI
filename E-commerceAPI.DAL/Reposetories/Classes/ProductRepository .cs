@@ -37,8 +37,11 @@ namespace E_commerceAPI.DAL.Reposetories.Classes
                 product.Quantity -= item.quantity;
                 await _context.SaveChangesAsync();
             }
-           
             
+        }
+        public  List<Product> GetAllproductWithImage()
+        {
+            return  _context.Products.Include(p => p.SubImage).Include(p=>p.Reviews).ThenInclude(u=>u.User).ToList();
         }
     }
 }

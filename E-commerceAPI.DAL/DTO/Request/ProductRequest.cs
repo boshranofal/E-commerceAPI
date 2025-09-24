@@ -17,6 +17,7 @@ namespace E_commerceAPI.DAL.DTO.Request
         public decimal Discount { get; set; }
         public double Rate { get; set; }
         public IFormFile ImageMain { get; set; }
+        public List<IFormFile>SubImage { get; set; }
         public int CategoryId { get; set; }
         public int? BrandId { get; set; }
 
