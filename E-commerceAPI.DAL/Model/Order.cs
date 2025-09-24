@@ -44,6 +44,6 @@ namespace E_commerceAPI.DAL.Model
         //العلاقة بين الاوردر وبين اليوزر 
         public string UserId {  get; set; }
         public ApplicationUser User { get; set; }
-
+        public List<OrderItem> OrderItems { get; set; }=new List<OrderItem>();
     }
 }

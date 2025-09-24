@@ -31,5 +31,35 @@ namespace E_commerceAPI.DAL.Reposetories.Classes
            return await _context.Orders.Include(o=>o.User)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
+        public async Task<List<Order>>GetAllWithUserStatus(string userId)
+        {
+            return await _context.Orders.Where(o=>o.UserId==userId).ToListAsync();
+        }
+        public async Task<List<Order>> GetByStatus(StatusOrderEnum statusOrder)
+        {
+            return await _context.Orders.Where(o=>o.Status==statusOrder)
+                .OrderByDescending(o=>o.OrderDate).ToListAsync();
+        }
+        public async Task<List<Order>> GetOrderByUser(string userId)
+        {
+          return await _context.Orders.Include(o => o.User)
+                .OrderByDescending(o => o.OrderDate).ToListAsync();
+        }
+        public async Task<bool>ChangeStatusAsync(string userId,StatusOrderEnum newStatus)
+        {
+            var user = await _context.Orders.FindAsync(userId);
+            if (user == null) return false;
+
+            user.Status= newStatus;
+            var result= await _context.SaveChangesAsync();
+            return result > 0;
+        }
+
+        public async Task<bool> UserHasApprovedOrderForProductAsync(string userId, int productId)
+        {
+            return await _context.Orders.Include(o => o.OrderItems)
+                .AnyAsync(e => e.UserId == userId && e.Status == StatusOrderEnum.approved&&
+                e.OrderItems.Any(i=>i.ProductId==productId));
+        }
     }
 }
