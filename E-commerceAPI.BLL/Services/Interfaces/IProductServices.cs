@@ -16,6 +16,6 @@ namespace E_commerceAPI.BLL.Services.Interfaces
     {
 
        Task<int>CreateFile(ProductRequest request);
-        Task<List<ProductResponce>> GetAllProduct(HttpRequest request, bool onlyActive = false);
+        Task<List<ProductResponce>> GetAllProduct(HttpRequest request, bool onlyActive = false,int pageNumber=1,int pageSize=1);
     }
 }

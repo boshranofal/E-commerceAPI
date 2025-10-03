@@ -44,14 +44,16 @@ namespace E_commerceAPI.BLL.Services.Classes
             return  _productRepository.Add(entity);
         }
 
-        public async Task<List<ProductResponce>> GetAllProduct(HttpRequest request, bool onlyActive = false)
+        public async Task<List<ProductResponce>> GetAllProduct(HttpRequest request, bool onlyActive = false, int pageSize=1,int pageNumber =1)
         {
             var products = _productRepository.GetAllproductWithImage();
             if (onlyActive)
             {
                 products=products.Where(p => p.Status == Status.Active).ToList();
             }
-            return products.Select(p => new ProductResponce
+            var pageProducts=products.Skip((pageNumber-1)*pageSize).Take(pageSize).ToList();
+
+            return pageProducts.Select(p => new ProductResponce
             {
                 Id = p.Id,
                 Name = p.Name,

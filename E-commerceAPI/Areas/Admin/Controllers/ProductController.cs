@@ -24,7 +24,11 @@ namespace E_commerceAPI.Areas.Admin.Controllers
         }
 
         [HttpGet("")]
-        public IActionResult GetAll()=> Ok(_productServices.GetAllProduct(Request));
+        public IActionResult GetAll([FromQuery]int pageNumbe=1, [FromQuery]int pageSize=5)
+        {
+            var products=_productServices.GetAllProduct(Request,false,pageNumbe,pageSize);
+            return Ok(products);
+        }
        
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromForm]ProductRequest productRequest)
