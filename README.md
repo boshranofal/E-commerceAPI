@@ -78,7 +78,7 @@ The API includes the following core modules:
 
 👩‍💻 **Boshra Sami**  
 💬 Passionate about Back-End Development and API Design.  
-🔗 [LinkedIn](https://www.linkedin.com/) | [GitHub](https://github.com/)
+🔗 [LinkedIn](https://www.linkedin.com/in/boshra-nofal-9247422a1/) | [GitHub](https://github.com/boshranofal)
 
 ---
 
